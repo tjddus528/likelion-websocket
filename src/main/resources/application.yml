@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: likelion-websocket
+server:
+  port: 8083

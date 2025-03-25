@@ -20,4 +20,17 @@ public class ChatMessage {
     private String content;
     @Getter
     private String sender;
+
+    public static ChatMessage createWelcomeMessage(String sender) {
+        ChatMessage welcomeMessage = ChatMessage.builder()
+                .sender("System")
+                .content(
+                        String.format("""
+                        %s 님이 들어왔습니다.
+                        """, sender))
+                .type(ChatMessage.MessageType.JOIN)
+                .build();
+
+        return welcomeMessage;
+    }
 }

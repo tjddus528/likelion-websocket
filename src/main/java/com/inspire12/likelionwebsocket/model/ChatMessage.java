@@ -2,11 +2,22 @@ package com.inspire12.likelionwebsocket.model;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 
 @Builder
 public class ChatMessage {
+
+    public static ChatMessage createWelcomeMessage(String name) {
+        return ChatMessage.builder()
+                .sender("System")
+                .content(
+                        String.format("""
+                                %s 님이 들어왔습니다.
+                                """, name))
+                .type(ChatMessage.MessageType.JOIN)
+                .build();
+
+    }
 
     public enum MessageType {
         CHAT,

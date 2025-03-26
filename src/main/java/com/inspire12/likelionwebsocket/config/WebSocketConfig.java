@@ -3,12 +3,19 @@ package com.inspire12.likelionwebsocket.config;
 import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.inspire12.likelionwebsocket.handshake.CustomHandshakeHandler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.ServerHttpRequest;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.converter.MessageConverter;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.simp.stomp.StompCommand;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -17,6 +24,7 @@ import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
 import java.nio.file.attribute.UserPrincipal;
 import java.security.Principal;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -24,6 +32,12 @@ import java.util.UUID;
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
+    private final CustomHandshakeHandler customHandshakeHandler;
+
+    public WebSocketConfig(CustomHandshakeHandler customHandshakeHandler) {
+        this.customHandshakeHandler = customHandshakeHandler;
+    }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -38,17 +52,27 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         // WebSocket 연결 엔드포인트 등록, SockJS fallback 제공
         registry.addEndpoint("/ws")
                 .setAllowedOrigins("http://localhost:3000") // 클라이언트 주소 허용
-                .setHandshakeHandler(new DefaultHandshakeHandler() {
-                    @Override
-                    protected Principal determineUser(ServerHttpRequest request,
-                                                      WebSocketHandler wsHandler,
-                                                      Map<String, Object> attributes) {
-                        // 예시: UUID 기반 임시 Principal 생성 (익명일 경우)
-                        return (UserPrincipal) () -> UUID.randomUUID().toString();
-                    }
-                })
-//                .setAllowedOrigins("*")
+                .setHandshakeHandler(customHandshakeHandler)
                 .withSockJS();
+    }
+
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(new ChannelInterceptor() {
+            @Override
+            public Message<?> preSend(Message<?> message, MessageChannel channel) {
+                StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+
+                if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+                    String authHeader = accessor.getFirstNativeHeader("Authorization");
+                    if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                        String token = authHeader.substring(7);
+                        accessor.setUser(() -> token);
+                    }
+                }
+                return message;
+            }
+        });
     }
 
     @Override

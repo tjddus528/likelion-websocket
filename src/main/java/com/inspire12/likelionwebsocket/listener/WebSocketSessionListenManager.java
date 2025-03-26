@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class WebSocketSessionManager {
+public class WebSocketSessionListenManager {
 
     private final Map<String, Principal> sessions = new ConcurrentHashMap<>();
 

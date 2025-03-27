@@ -24,7 +24,7 @@ public class ChatAdminController {
     }
 
     @PostMapping("/call/user")
-    public ChatMessage callUser(@RequestParam String username, @RequestBody ChatMessage chatMessage) {
+    public ChatMessage call(@RequestParam String username, @RequestBody ChatMessage chatMessage) {
         stompMessagingService.sendToUser(username, chatMessage);
         return chatMessage;
     }

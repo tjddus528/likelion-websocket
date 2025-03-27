@@ -45,6 +45,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         config.enableSimpleBroker("/topic", "/queue");
         // 클라이언트가 메시지를 보낼 때 사용하는 prefix 설정 (예: /app)
         config.setApplicationDestinationPrefixes("/app");
+        config.setUserDestinationPrefix("/user");
     }
 
     @Override
@@ -58,24 +59,24 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .withSockJS();
     }
 
-    @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(new ChannelInterceptor() {
-            @Override
-            public Message<?> preSend(Message<?> message, MessageChannel channel) {
-                StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
-
-                if (StompCommand.CONNECT.equals(accessor.getCommand())) {
-                    String authHeader = accessor.getFirstNativeHeader("Authorization");
-                    if (authHeader != null && authHeader.startsWith("Bearer ")) {
-                        String token = authHeader.substring(7);
-                        accessor.setUser(() -> token);
-                    }
-                }
-                return message;
-            }
-        });
-    }
+//    @Override
+//    public void configureClientInboundChannel(ChannelRegistration registration) {
+//        registration.interceptors(new ChannelInterceptor() {
+//            @Override
+//            public Message<?> preSend(Message<?> message, MessageChannel channel) {
+//                StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+//
+//                if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+//                    String authHeader = accessor.getFirstNativeHeader("Authorization");
+//                    if (authHeader != null && authHeader.startsWith("Bearer ")) {
+//                        String token = authHeader.substring(7);
+//                        accessor.setUser(() -> token);
+//                    }
+//                }
+//                return message;
+//            }
+//        });
+//    }
 
     @Override
     public boolean configureMessageConverters(List<MessageConverter> messageConverters) {

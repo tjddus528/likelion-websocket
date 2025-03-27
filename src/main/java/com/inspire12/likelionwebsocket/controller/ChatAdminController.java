@@ -13,7 +13,7 @@ public class ChatAdminController {
 
     private final StompMessagingService stompMessagingService;
 
-    public ChatAdminController(SimpMessagingTemplate messagingTemplate, StompMessagingService stompMessagingService) {
+    public ChatAdminController(StompMessagingService stompMessagingService) {
         this.stompMessagingService = stompMessagingService;
     }
 

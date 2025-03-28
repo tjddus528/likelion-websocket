@@ -21,7 +21,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @RequiredArgsConstructor
 public class ChatWebSocketHandler extends TextWebSocketHandler {
 
-//  private final Set<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
   private final ObjectMapper objectMapper;
 
   @Override

@@ -1,6 +1,5 @@
 package com.inspire12.likelionwebsocket.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.inspire12.likelionwebsocket.model.ChatMessage;
 import com.inspire12.likelionwebsocket.service.MessageService;
 import lombok.RequiredArgsConstructor;

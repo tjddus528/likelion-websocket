@@ -1,6 +1,5 @@
 package com.inspire12.likelionwebsocket.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inspire12.likelionwebsocket.holder.WebSocketSessionHolder;
 import com.inspire12.likelionwebsocket.model.ChatMessage;

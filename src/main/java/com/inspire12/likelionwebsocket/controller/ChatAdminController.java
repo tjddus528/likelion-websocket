@@ -18,4 +18,9 @@ public class ChatAdminController {
     return messageService.sendMessage(chatMessage);
   }
 
+  @PostMapping("/call/user")
+  public ChatMessage callUser(@RequestBody ChatMessage chatMessage) {
+    return messageService.sendAdminMessage(chatMessage);
+  }
+
 }

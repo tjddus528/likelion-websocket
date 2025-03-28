@@ -6,6 +6,7 @@ import com.inspire12.likelionwebsocket.model.ChatMessage;
 import java.io.IOException;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -13,6 +14,7 @@ import org.springframework.web.socket.WebSocketSession;
 @RequiredArgsConstructor
 @Service
 public class MessageService {
+    private final SimpMessagingTemplate simpMessagingTemplate;
     private final ObjectMapper objectMapper;
 
     public ChatMessage createWelcomeMessage(ChatMessage chatMessage) {
@@ -32,5 +34,11 @@ public class MessageService {
             throw new RuntimeException(e);
         }
         return chatMessage;
+    }
+
+    public ChatMessage sendAdminMessage(ChatMessage chatMessage) {
+        ChatMessage adminMessage = ChatMessage.createAdminMessage(chatMessage.getContent());
+        simpMessagingTemplate.convertAndSend("/topic/public", adminMessage);
+        return adminMessage;
     }
 }
